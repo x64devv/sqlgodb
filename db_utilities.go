@@ -1,29 +1,29 @@
-package main 
+package sqlgodb
 
 import (
 	"fmt"
 	"strings"
 )
 
-func insertStmtStr (size int) string {
-	var str []string ;
-	for i:= 0; i < size; i ++{
-		str = append(str, "?");
+func insertStmtStr(size int) string {
+	var str []string
+	for i := 0; i < size; i++ {
+		str = append(str, "?")
 	}
 	return strings.Join(str, ",")
 }
 
-func updateStmtStr(slice []string)  string{
-	var str []string;
-	for _, key := range slice{
+func updateStmtStr(slice []string) string {
+	var str []string
+	for _, key := range slice {
 		str = append(str, fmt.Sprintf("%s = ?", key))
 	}
-	return strings.Join(str, ",");
+	return strings.Join(str, ",")
 }
 
-func arrayToInterfaceArr[T any](array []T) []interface{}{
-	var arrayInterface []interface{} 
-	for _, val := range array{
+func arrayToInterfaceArr[T any](array []T) []interface{} {
+	var arrayInterface []interface{}
+	for _, val := range array {
 		arrayInterface = append(arrayInterface, val)
 	}
 	return arrayInterface

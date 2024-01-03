@@ -1,4 +1,4 @@
-package main
+package sqlgodb
 
 import (
 	"context"
@@ -41,7 +41,7 @@ func initDBConnection(config *mysql.Config) *sql.DB {
 	return db
 }
 
-func InsertIntoTable(table string, columns []string, values []string) *DBResult{
+func InsertIntoTable(table string, columns []string, values []string) *DBResult {
 	queryStr := fmt.Sprintf("INSERT INTO %s (%s) VALUES(%s)", table, strings.Join(columns, ","), insertStmtStr(len(values)))
 
 	stmt, prepareError := dbInstace.Prepare(queryStr)
@@ -56,7 +56,7 @@ func InsertIntoTable(table string, columns []string, values []string) *DBResult{
 
 	insertResult, insertErr := stmt.Exec(newValues...)
 	if insertErr != nil {
-		return &DBResult{ 
+		return &DBResult{
 			Err: insertErr,
 		}
 	}
@@ -67,12 +67,12 @@ func InsertIntoTable(table string, columns []string, values []string) *DBResult{
 		}
 	}
 	return &DBResult{
-		Err: nil,
+		Err:          nil,
 		LastInsertId: int(lastInsertId),
 	}
 }
 
-func QueryData(table string, whereClause string, values []string) *DBResult{
+func QueryData(table string, whereClause string, values []string) *DBResult {
 	queryStr := fmt.Sprintf("SELECT * FROM %s", table)
 	queryStr = fmt.Sprintf("%s %s", queryStr, whereClause)
 
@@ -83,7 +83,7 @@ func QueryData(table string, whereClause string, values []string) *DBResult{
 	if prepareError != nil {
 		return &DBResult{
 			Err: prepareError,
-		} 
+		}
 	} else {
 		defer stmt.Close()
 	}
@@ -97,15 +97,15 @@ func QueryData(table string, whereClause string, values []string) *DBResult{
 
 	return &DBResult{
 		Rows: rows,
-		Err: nil,
+		Err:  nil,
 	}
 }
 
 func UpdateTable(table string, whereClause string, columns []string, values []string) *DBResult {
 	if len(columns) != len(values) {
-		return  &DBResult{
+		return &DBResult{
 			Err: errors.New("columns dont match the values"),
-		} 
+		}
 	}
 
 	queyStr := fmt.Sprintf("UPDATE %s SET %s %s", table, updateStmtStr(columns), whereClause)
@@ -115,7 +115,7 @@ func UpdateTable(table string, whereClause string, columns []string, values []st
 	if prepareError != nil {
 		return &DBResult{
 			Err: prepareError,
-		} 
+		}
 	} else {
 		defer stmt.Close()
 	}
@@ -125,7 +125,7 @@ func UpdateTable(table string, whereClause string, columns []string, values []st
 	if updateError != nil {
 		return &DBResult{
 			Err: updateError,
-		} 
+		}
 	}
 
 	affected, affectedError := update.RowsAffected()
@@ -133,15 +133,15 @@ func UpdateTable(table string, whereClause string, columns []string, values []st
 	if affectedError != nil {
 		return &DBResult{
 			Err: affectedError,
-		} 
+		}
 	}
 	return &DBResult{
 		Affected: int(affected),
-		Err: nil,
+		Err:      nil,
 	}
 }
 
-func DeleteFromTable(table string, whereClause string, values []string) *DBResult{
+func DeleteFromTable(table string, whereClause string, values []string) *DBResult {
 	queyStr := fmt.Sprintf("DELETE FROM %s %s", table, whereClause)
 	newValues := arrayToInterfaceArr[string](values)
 	update, updateError := dbInstace.ExecContext(context.Background(), queyStr, newValues...)
@@ -161,13 +161,13 @@ func DeleteFromTable(table string, whereClause string, values []string) *DBResul
 	}
 	return &DBResult{
 		Affected: int(affected),
-		Err: nil,
-	} 
+		Err:      nil,
+	}
 }
 
 type DBResult struct {
-	Rows *sql.Rows
-	Err error
-	Affected int
+	Rows         *sql.Rows
+	Err          error
+	Affected     int
 	LastInsertId int
 }
